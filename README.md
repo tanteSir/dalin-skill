@@ -1,53 +1,55 @@
 # code-slim
 
-**Language-agnostic code slimming engine for AI coding agents.** 通用代码瘦身引擎。
+[中文](README.zh-CN.md)
 
-[code-slim](#) scans your codebase for dead code, duplication, god files, scattered configs, and more — then executes safe deletions and refactors on an isolated git branch with mandatory verification at every step.
+**Language-agnostic code slimming engine for AI coding agents.**
 
-> **在 AI 辅助开发的时代，代码膨胀的速度比以往更快。** AI 生成代码很快，但清理代码很慢。code-slim 是一个给 AI coding agent 用的 skill，让 agent 能系统地扫描、诊断、安全地精简代码库。
+[code-slim](https://github.com/tanteSir/code-slim) scans your codebase for dead code, duplication, god files, scattered configs, and more — then executes safe deletions and refactors on an isolated git branch with mandatory verification at every step.
 
-## Why / 为什么需要
+> In the era of AI-assisted development, code bloat happens faster than ever. AI generates code quickly, but cleaning it up is slow. code-slim is an AI coding agent skill that systematically scans, diagnoses, and safely trims your codebase.
 
-| Problem | code-slim 的解法 |
-|---------|-----------------|
-| AI 生成了死代码但从不清理 | 3 层引用验证确认零引用后才标记为 S0 可删 |
-| 重复代码越积越多 | ≥3 次相似自动识别，提取共享函数 |
-| God 文件越来越大 | 量化阈值（500行/3职责）自动标记，输出拆分建议 |
-| 重构怕改坏 | 独立 `*-slim` 分支 + 每条改动独立验证 + 安全等级分级 |
-| 每次"瘦身"标准不一样 | references 固定扫描模式、白名单、量化阈值 |
+## Why
 
-## How It Works / 工作流程
+| Problem | How code-slim solves it |
+|---------|------------------------|
+| AI generates dead code but never cleans it | 3-layer reference verification confirms zero usage before marking as S0 (safe to delete) |
+| Duplicate code accumulates | Auto-detects ≥3 similar occurrences, extracts shared functions |
+| God files keep growing | Quantified thresholds (500 lines / 3 responsibilities) auto-flag, outputs split suggestions |
+| Fear of breaking things during refactor | Isolated `*-slim` branch + per-item independent verification + 4-level safety classification |
+| Inconsistent "slimming" standards across runs | references/ fixes scan patterns, whitelists, and quantified thresholds |
+
+## How It Works
 
 ```
-Stage 0: 创建 *-slim 分支（隔离所有改动）
+Stage 0: Create *-slim branch (isolate all changes)
     ↓
-Stage 1: 安全扫描（grep 3 层验证，确认安全等级 S0-S3）
+Stage 1: Safety scan (grep 3-layer verification, classify S0-S3)
     ↓
-Stage 2: 按 8 条规则扫描（R1-R8，量化阈值判据）
+Stage 2: Scan by 8 rules (R1-R8, quantified thresholds)
     ↓
-Stage 3: 输出优化清单（表格，按优先级排序）
+Stage 3: Output optimization checklist (sorted by priority)
     ↓
-Stage 4: 逐条执行 + 每条验证（import / build / test）
+Stage 4: Execute one by one + verify each (import / build / test)
     ↓
-Stage 5: 更新架构路由表
+Stage 5: Update architecture route table
     ↓
-用户确认 → 合并分支 or 回滚
+User confirms → merge branch or rollback
 ```
 
-## 8 Scan Rules / 8 条扫描规则
+## 8 Scan Rules
 
 | Rule | What it finds | Safety |
 |------|--------------|--------|
-| **R1** Dead code | 零引用的文件/函数/变量/类 | S0 — 直接删 |
-| **R2** Duplication | ≥3 次相似代码，≥5 行 | S1 — 提取共享函数 |
-| **R3** Over-engineering | 20 行逻辑用了 200 行 | 标注，不强制 |
-| **R4** God file/function | >500行且≥3职责 / >80行且做≥3事 | S2 — 建议拆分 |
-| **R5** Scattered configs | 同名字典在≥3个文件独立定义 | S2 — 集中管理 |
-| **R6** Type safety gaps | `any` / 缺类型注解 | S2 |
-| **R7** Error handling gaps | DB 查询无空值检查、API 无 try-catch | S3 |
-| **R8** Token waste estimate | 汇总浪费行数和估算 token 数 | 报告 |
+| **R1** Dead code | Zero-reference files/functions/variables/classes | S0 — direct delete |
+| **R2** Duplication | ≥3 similar occurrences, ≥5 lines | S1 — extract shared function |
+| **R3** Over-engineering | 20-line logic wrapped in 200 lines | Flag only, no force |
+| **R4** God file/function | >500 lines & ≥3 responsibilities / >80 lines & ≥3 tasks | S2 — suggest split |
+| **R5** Scattered configs | Same-name dicts defined independently in ≥3 files | S2 — consolidate |
+| **R6** Type safety gaps | `any` / missing type annotations | S2 |
+| **R7** Error handling gaps | DB queries without null checks, API without try-catch | S3 |
+| **R8** Token waste estimate | Total wasted lines and estimated token count | Report |
 
-## Safety System / 安全机制
+## Safety System
 
 ### 4-Level Safety Classification
 
@@ -74,34 +76,34 @@ Any hit → not dead code, downgrade to S2 or skip.
 
 Framework entry points, ORM models, Celery tasks, and other implicitly-referenced code are protected by default. See [references/project-rules.md](references/project-rules.md).
 
-## File Structure / 文件结构
+## File Structure
 
 ```
 code-slim/
-├── SKILL.md                              # 主提示词 — 5 阶段完整流程
+├── SKILL.md                              # Main prompt — 5-stage workflow
 └── references/
-    ├── scan-patterns.md                  # 扫描模式清单 (P1-P8)
-    ├── project-rules.md                  # 项目白名单 (不能删的文件/模块)
-    └── metrics-threshold.md              # 量化阈值 (什么算"胖")
+    ├── scan-patterns.md                  # Scan pattern checklist (P1-P8)
+    ├── project-rules.md                  # Project whitelist (protected files/modules)
+    └── metrics-threshold.md              # Quantified thresholds (what counts as "fat")
 ```
 
 ### Why references?
 
-| 文件 | 解决的问题 |
-|------|-----------|
-| `scan-patterns.md` | 每次扫描标准一致，不靠 LLM 自己想该查什么 |
-| `project-rules.md` | 防止误删框架入口、ORM Model、Celery 任务等隐性引用 |
-| `metrics-threshold.md` | "500行算大文件"等标准固定，不同批次扫描结果可比 |
+| File | What it solves |
+|------|---------------|
+| `scan-patterns.md` | Consistent scan standards across runs — no relying on LLM to invent patterns |
+| `project-rules.md` | Prevents accidental deletion of framework entries, ORM models, Celery tasks, etc. |
+| `metrics-threshold.md` | Fixed standards like "500 lines = large file" — comparable results across batches |
 
-## Install / 安装
+## Install
 
 ### Claude Code
 
 ```bash
-# 方式 1: 放到全局 skills 目录
+# Option 1: Global skills directory
 cp -r code-slim/ ~/.claude/skills/
 
-# 方式 2: 放到 agents skills 目录
+# Option 2: Agents skills directory
 cp -r code-slim/ ~/.agents/skills/
 ```
 
@@ -111,35 +113,35 @@ cp -r code-slim/ ~/.agents/skills/
 cp -r code-slim/ ~/.config/opencode/skills/
 ```
 
-### OpenAI Codex / 其他 Agent
+### OpenAI Codex / Other Agents
 
-将 `SKILL.md` 内容放入项目的 `AGENTS.md` 或 agent 的指令文件中。
+Add `SKILL.md` content to your project's `AGENTS.md` or agent instruction file.
 
-## Usage / 使用
+## Usage
 
-在 AI coding agent 对话中说：
+In your AI coding agent conversation, say:
 
 - "代码瘦身" / "瘦身扫描" / "slim" / "精简代码"
 
-Agent 会自动：
+The agent will automatically:
 
-1. 创建 `{当前分支}-slim` 分支
-2. 扫描整个代码库，输出优化清单
-3. 等你确认后逐条执行
-4. 每条改动验证通过后才继续下一条
-5. 全部完成后等你确认是否合并
+1. Create a `{branch}-slim` branch
+2. Scan the entire codebase and output an optimization checklist
+3. Wait for your confirmation before executing
+4. Verify each change before proceeding to the next
+5. Wait for your confirmation to merge when all done
 
-## Language Support / 语言支持
+## Language Support
 
 | Language | Dead Code | Duplication | Refactor | Verification |
 |----------|-----------|-------------|----------|-------------|
-| **Python** | `__init__.py` import 算引用 | ✓ | ✓ | `pytest` / `python -c "import ..."` |
-| **TypeScript/React** | barrel export 算引用 | ✓ | ✓ | `npm run build` |
-| **Go** | 编译器警告覆盖 | 接口抽取 | ✓ | `go build` |
-| **Java** | 编译器警告覆盖 | 泛型化 | ✓ | `mvn compile` |
-| **Rust** | 编译器警告覆盖 | 泛型化 | ✓ | `cargo build` |
+| **Python** | `__init__.py` imports count | ✓ | ✓ | `pytest` / `python -c "import ..."` |
+| **TypeScript/React** | Barrel exports count | ✓ | ✓ | `npm run build` |
+| **Go** | Compiler warnings cover most | Interface extraction | ✓ | `go build` |
+| **Java** | Compiler warnings cover most | Generics | ✓ | `mvn compile` |
+| **Rust** | Compiler warnings cover most | Generics | ✓ | `cargo build` |
 
-## Example Output / 扫描输出示例
+## Example Output
 
 ```markdown
 | # | Safety | Rule | File | Lines | Issue | Suggestion | Est. Reduction |
@@ -152,16 +154,16 @@ Agent 会自动：
 |    |    |    |    | **Total** | | | **~97 lines** |
 ```
 
-## Related Skills / 相关 Skills
+## Related Skills
 
-- **[neat-freak](https://github.com/...)** — 文档和记忆的洁癖级同步（code-slim 瘦代码，neat-freak 瘦文档）
+- **[neat-freak](https://github.com/...)** — OCD-level doc & memory sync (code-slim trims code, neat-freak trims docs)
 
-## Contact / 联系
+## Contact
 
-有想法或建议？找我聊：
+Ideas or suggestions? Let's talk:
 
-- **WeChat / 微信**: `tanteSir`
-- **GitHub Issues**: [提交 Issue](https://github.com/tanteSir/code-slim/issues)
+- **WeChat**: `tanteSir`
+- **GitHub Issues**: [Submit Issue](https://github.com/tanteSir/code-slim/issues)
 
 ## License
 
