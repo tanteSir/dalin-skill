@@ -1,6 +1,11 @@
-# Skill: code-slim — 通用代码瘦身引擎
+---
+name: code-slim
+description: 通用代码瘦身引擎。语言无关的代码瘦身工具，扫描死代码、重复代码、God文件、未使用import，安全等级分级，独立分支操作。关键词：代码瘦身、瘦身扫描、slim、精简代码、code slim、trim code、reduce code
+---
 
-> 语言无关的代码瘦身工具。扫描 → 诊断 → 执行 → 验证。
+# 代码瘦身引擎 — 扫描 → 诊断 → 执行 → 验证
+
+> 语言无关的代码瘦身工具。
 > 触发词：代码瘦身、瘦身扫描、slim、精简代码
 
 ## 核心原则
@@ -247,5 +252,5 @@ grep -rn "CONSTANT_NAME" --include="*.py" --include="*.ts" --include="*.tsx" | g
    ```bash
    git checkout {原分支}
    git merge {原分支}-slim
-   git branch -d {原分支}-slim
-   ```
+    git branch -d {原分支}-slim
+    ```

@@ -1,170 +1,94 @@
-# code-slim
+# dalin-skills
 
-[中文](README.zh-CN.md)
+> A collection of AI agent skills for OpenCode / Claude Code / Codex, built by [dalin](https://github.com/tanteSir).
 
-**Language-agnostic code slimming engine for AI coding agents.**
+AI Agent 技能集合，为 OpenCode / Claude Code / Codex 等 AI 编程助手提供专业化能力。
 
-[code-slim](https://github.com/tanteSir/code-slim) scans your codebase for dead code, duplication, god files, scattered configs, and more — then executes safe deletions and refactors on an isolated git branch with mandatory verification at every step.
+---
 
-> In the era of AI-assisted development, code bloat happens faster than ever. AI generates code quickly, but cleaning it up is slow. code-slim is an AI coding agent skill that systematically scans, diagnoses, and safely trims your codebase.
+## Skills
 
-## Why
+### [code-slim](./code-slim/)
 
-| Problem | How code-slim solves it |
-|---------|------------------------|
-| AI generates dead code but never cleans it | 3-layer reference verification confirms zero usage before marking as S0 (safe to delete) |
-| Duplicate code accumulates | Auto-detects ≥3 similar occurrences, extracts shared functions |
-| God files keep growing | Quantified thresholds (500 lines / 3 responsibilities) auto-flag, outputs split suggestions |
-| Fear of breaking things during refactor | Isolated `*-slim` branch + per-item independent verification + 4-level safety classification |
-| Inconsistent "slimming" standards across runs | references/ fixes scan patterns, whitelists, and quantified thresholds |
+通用代码瘦身引擎。语言无关，扫描 → 诊断 → 执行 → 验证。
 
-## How It Works
+| 能力 | 说明 |
+|------|------|
+| 死代码检测 | S0 零引用自动删除（文件/函数/变量/常量/未使用 import） |
+| 重复代码提取 | S1 3+ 次重复模式提取为共享函数 |
+| God 文件拆分 | S2 >500 行多职责文件拆分建议 |
+| 安全分级 | S0~S3 四级，逐条执行 + 每条验证 |
+| 分支隔离 | 所有改动在 `*-slim` 分支，不污染主线 |
+| 全语言支持 | Python / TypeScript / Go / Java / Rust 均适用 |
 
-```
-Stage 0: Create *-slim branch (isolate all changes)
-    ↓
-Stage 1: Safety scan (grep 3-layer verification, classify S0-S3)
-    ↓
-Stage 2: Scan by 8 rules (R1-R8, quantified thresholds)
-    ↓
-Stage 3: Output optimization checklist (sorted by priority)
-    ↓
-Stage 4: Execute one by one + verify each (import / build / test)
-    ↓
-Stage 5: Update architecture route table
-    ↓
-User confirms → merge branch or rollback
-```
+**触发词**: 代码瘦身、瘦身扫描、slim、精简代码、code slim、trim code
 
-## 8 Scan Rules
+---
 
-| Rule | What it finds | Safety |
-|------|--------------|--------|
-| **R1** Dead code | Zero-reference files/functions/variables/classes | S0 — direct delete |
-| **R2** Duplication | ≥3 similar occurrences, ≥5 lines | S1 — extract shared function |
-| **R3** Over-engineering | 20-line logic wrapped in 200 lines | Flag only, no force |
-| **R4** God file/function | >500 lines & ≥3 responsibilities / >80 lines & ≥3 tasks | S2 — suggest split |
-| **R5** Scattered configs | Same-name dicts defined independently in ≥3 files | S2 — consolidate |
-| **R6** Type safety gaps | `any` / missing type annotations | S2 |
-| **R7** Error handling gaps | DB queries without null checks, API without try-catch | S3 |
-| **R8** Token waste estimate | Total wasted lines and estimated token count | Report |
+### [seo-china](./seo-china/)
 
-## Safety System
+国内百度 SEO 全链路配置。从零到收录，8 层执行清单。
 
-### 4-Level Safety Classification
+| 能力 | 说明 |
+|------|------|
+| 百度站长验证 | HTML meta 验证 + API 推送 |
+| 中文 Metadata | title / description / keywords / OG 全套 / 百度验证 |
+| Sitemap + Robots | 动态生成，只含公开页面 |
+| JSON-LD 结构化数据 | Organization / SoftwareApplication / WebSite / FAQPage |
+| FAQ 板块 | FAQPage schema → Google 富摘要 + E-E-A-T 信号 + 转化提升 |
+| 公开内容页 | SSR + Docker 内部网络 + LLM 懒生成 AI 分析 |
+| 百度自动推送 | Celery beat 每日推送新增 URL，持续收录 |
+| 百度统计 | 安装代码增加百度信任信号 |
+| Nginx 优化 | 域名统一 301 / gzip / 安全头 / 静态资源缓存 |
 
-| Level | Meaning | Action | Required Verification |
-|-------|---------|--------|-----------------------|
-| **S0** | Zero-reference dead code | Direct delete | grep 3-layer zero hits |
-| **S1** | Duplicate code extraction | Extract shared function | All callers import OK |
-| **S2** | Internal refactor | Split / externalize / parameterize | No external API change |
-| **S3** | May affect behavior | Full test run required | Test coverage required |
+**触发词**: 国内SEO、百度SEO、百度收录、百度站长、百度统计、sitemap、结构化数据
 
-### 3-Layer Dead Code Verification
+**References**: `nextjs-templates.md` / `nginx-template.md` / `jsonld-templates.md` / `og-image-generation.md` / `public-content-page.md` / `baidu-auto-push.md` / `seo-ranking-research.md`
 
-Before marking anything as S0 (safe to delete), all 3 layers must return zero hits:
+---
 
-```
-Layer 1: grep import statements       → is the filename imported anywhere?
-Layer 2: grep exported symbols        → are class/function names referenced?
-Layer 3: grep barrel exports          → is it re-exported via __init__.py / index.ts?
-```
+### [seo-google](./seo-google/)
 
-Any hit → not dead code, downgrade to S2 or skip.
+海外 Google SEO 全链路配置。面向英文市场的搜索引擎优化。
 
-### Project-Level Whitelist
+| 能力 | 说明 |
+|------|------|
+| Google Search Console | 资源添加 + sitemap 提交 + 索引请求 |
+| Google Analytics 4 | GA4 安装代码模板 |
+| 英文 Metadata | 英文 title / description / OG / hreflang 多语言互指 |
+| hreflang 标签 | 中英文站双向互指，避免重复内容惩罚 |
+| Core Web Vitals | LCP / INP / CLS 优化指引 + Next.js 自动优化 |
+| Google Indexing API | 主动推送 URL，200 条/天（百度仅 10 条） |
+| JSON-LD 富摘要 | FAQPage / SoftwareApplication / HowTo / BreadcrumbList |
 
-Framework entry points, ORM models, Celery tasks, and other implicitly-referenced code are protected by default. See [references/project-rules.md](references/project-rules.md).
+**触发词**: 海外SEO、Google SEO、Google收录、Search Console、Google Analytics、hreflang、Core Web Vitals
 
-## File Structure
+---
 
-```
-code-slim/
-├── SKILL.md                              # Main prompt — 5-stage workflow
-└── references/
-    ├── scan-patterns.md                  # Scan pattern checklist (P1-P8)
-    ├── project-rules.md                  # Project whitelist (protected files/modules)
-    └── metrics-threshold.md              # Quantified thresholds (what counts as "fat")
-```
+## 安装使用
 
-### Why references?
-
-| File | What it solves |
-|------|---------------|
-| `scan-patterns.md` | Consistent scan standards across runs — no relying on LLM to invent patterns |
-| `project-rules.md` | Prevents accidental deletion of framework entries, ORM models, Celery tasks, etc. |
-| `metrics-threshold.md` | Fixed standards like "500 lines = large file" — comparable results across batches |
-
-## Install
-
-### Claude Code
+将需要的 skill 目录复制到你的 agent skills 目录：
 
 ```bash
-# Option 1: Global skills directory
-cp -r code-slim/ ~/.claude/skills/
+# OpenCode
+cp -r seo-china/ ~/.config/opencode/skills/
 
-# Option 2: Agents skills directory
-cp -r code-slim/ ~/.agents/skills/
+# Claude Code
+cp -r seo-china/ ~/.claude/skills/
+
+# Codex
+cp -r seo-china/ ~/.codex/skills/
 ```
 
-### OpenCode
-
-```bash
-cp -r code-slim/ ~/.config/opencode/skills/
-```
-
-### OpenAI Codex / Other Agents
-
-Add `SKILL.md` content to your project's `AGENTS.md` or agent instruction file.
-
-## Usage
-
-In your AI coding agent conversation, say:
-
-- "代码瘦身" / "瘦身扫描" / "slim" / "精简代码"
-
-The agent will automatically:
-
-1. Create a `{branch}-slim` branch
-2. Scan the entire codebase and output an optimization checklist
-3. Wait for your confirmation before executing
-4. Verify each change before proceeding to the next
-5. Wait for your confirmation to merge when all done
-
-## Language Support
-
-| Language | Dead Code | Duplication | Refactor | Verification |
-|----------|-----------|-------------|----------|-------------|
-| **Python** | `__init__.py` imports count | ✓ | ✓ | `pytest` / `python -c "import ..."` |
-| **TypeScript/React** | Barrel exports count | ✓ | ✓ | `npm run build` |
-| **Go** | Compiler warnings cover most | Interface extraction | ✓ | `go build` |
-| **Java** | Compiler warnings cover most | Generics | ✓ | `mvn compile` |
-| **Rust** | Compiler warnings cover most | Generics | ✓ | `cargo build` |
-
-## Example Output
-
-```markdown
-| # | Safety | Rule | File | Lines | Issue | Suggestion | Est. Reduction |
-|---|--------|------|------|-------|-------|------------|---------------|
-| 1 | S0 | R1 | utils/old_helpers.py | 45 | Zero references | Delete | 45 |
-| 2 | S0 | R1 | constants.ts:12-18 | 6 | Unused STATUS_MAP | Delete | 6 |
-| 3 | S1 | R2 | service.py:80-95 (x3) | 48 | Duplicate error handling | Extract handle_api_error() | 32 |
-| 4 | S2 | R4 | articles/page.tsx | 520 | God component (4 responsibilities) | Split into 4 components | - |
-| 5 | S2 | R5 | 3 files | 21 | Platform name map scattered | Consolidate to constants.ts | 14 |
-|    |    |    |    | **Total** | | | **~97 lines** |
-```
-
-## Related Skills
-
-- **[neat-freak](https://github.com/...)** — OCD-level doc & memory sync (code-slim trims code, neat-freak trims docs)
-
-## Contact
-
-Ideas or suggestions? Let's talk:
-
-- **WeChat**: `tanteSir`
-- **GitHub Issues**: [Submit Issue](https://github.com/tanteSir/code-slim/issues)
+每个 skill 的 `SKILL.md` 包含完整的执行流程、代码模板、坑点速查和检查清单。
 
 ## License
 
 MIT
+
+---
+
+Ideas or suggestions? Let's talk:
+
+WeChat: tanteSir
+GitHub Issues: https://github.com/tanteSir/dalin-skills/issues
