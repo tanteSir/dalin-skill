@@ -38,27 +38,17 @@ export const metadata: Metadata = {
 
 ## 百度统计安装
 
-在 `layout.tsx` 的 `<body>` 内添加百度统计脚本（增加百度信任信号）：
+在 `layout.tsx` 的 `<html>` 和 `<body>` 之间（即 `<head>` 内）添加百度统计脚本（增加百度信任信号）：
 
 ```typescript
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="zh-CN">
-      <body>
-        {/* 百度统计 — 用你的 key 替换 */}
-        <script dangerouslySetInnerHTML={{
-          __html: `
-var _hmt = _hmt || [];
-(function() {
-  var hm = document.createElement("script");
-  hm.src = "https://hm.baidu.com/hm.js?你的百度统计key";
-  var s = document.getElementsByTagName("script")[0];
-  s.parentNode.insertBefore(hm, s);
-})();
-          `,
-        }} />
-        {children}
-      </body>
+      <head>
+        {/* 百度统计 — 用你的 key 替换 hm.js? 后面的字符串 */}
+        <script async src="https://hm.baidu.com/hm.js?你的百度统计key" />
+      </head>
+      <body>{children}</body>
     </html>
   );
 }

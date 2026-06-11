@@ -56,6 +56,78 @@ export default function LandingPage() {
 | `HowTo` | 教程/步骤 | 有教程的页面 |
 | `Article` | 文章 | 博客/内容页 |
 | `BreadcrumbList` | 面包屑导航 | 有层级结构的页面 |
+| `NewsArticle` | 新闻/热点文章 | 内容详情页（热点、资讯等） |
+
+## NewsArticle 结构化数据（内容详情页）
+
+用于热点、资讯、博客等独立内容页。每个详情页是独立的 SEO 入口，帮助搜索引擎展示文章富摘要。
+
+```tsx
+// src/app/[content]/[id]/page.tsx
+export default async function ContentDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  const item = await getItem(id);
+
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "NewsArticle",
+    headline: item.title,
+    description: item.summary || item.title,
+    datePublished: item.created_at,
+    dateModified: item.created_at,
+    author: {
+      "@type": "Organization",
+      name: "品牌名",
+      url: "https://www.example.com",
+    },
+    publisher: {
+      "@type": "Organization",
+      name: "品牌名",
+      url: "https://www.example.com",
+    },
+    mainEntityOfPage: {
+      "@type": "WebPage",
+      "@id": `https://www.example.com/${content}/${id}`,
+    },
+  };
+
+  return (
+    <main>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      {/* 页面内容 */}
+    </main>
+  );
+}
+```
+
+### 动态 metadata 配合
+
+```tsx
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
+  const { id } = await params;
+  const item = await getItem(id);
+  const CATEGORY_SUFFIX: Record<string, string> = {
+    "科技": "科技行业热点分析",
+    "商业": "商业财经选题素材",
+    // 按你的分类扩展...
+  };
+  const suffix = CATEGORY_SUFFIX[item.category || ""] || "内容素材";
+
+  return {
+    title: `${item.title} | ${suffix} — 品牌名`,
+    description: `${item.summary || item.title}。品牌名精选${item.category || ""}领域内容，提供深度分析。`,
+    alternates: { canonical: `https://www.example.com/${content}/${id}` },
+    openGraph: {
+      title: `${item.title} | ${suffix} — 品牌名`,
+      description: `${item.summary || item.title}`,
+      url: `https://www.example.com/${content}/${id}`,
+    },
+  };
+}
+```
 
 ## FAQPage 结构化数据（落地页 FAQ 板块）
 
